@@ -16,4 +16,19 @@ describe Oystercard do
   it 'deducts the amount given' do
     expect { subject.deduct(10) }.to change { subject.balance }.by(-10)
   end
+
+  it 'starts as not in use' do
+    expect(subject).to_not be_in_journey
+  end
+
+  it 'allows you to start a journey' do
+    subject.tap_in
+    expect(subject).to be_in_journey
+  end
+
+  it 'allows you to end journey' do
+    subject.tap_in
+    subject.tap_out
+    expect(subject).to_not be_in_journey
+  end
 end
