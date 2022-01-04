@@ -1,0 +1,19 @@
+CARD
+  NOUNS
+    balance
+    limit
+    minimum
+    history
+
+  VERBS
+    tap
+    pay
+    penalise
+
+STATION
+  zone
+
+TRIP
+  start_point
+  distance
+  fare
