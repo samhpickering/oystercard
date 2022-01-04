@@ -13,4 +13,7 @@ describe Oystercard do
     expect { subject.top_up( Oystercard::LIMIT + 1) }.to raise_error "Top up would take card balance over £#{Oystercard::LIMIT} limit"
   end
 
+  it 'deducts the amount given' do
+    expect { subject.deduct(10) }.to change { subject.balance }.by(-10)
+  end
 end

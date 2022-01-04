@@ -8,7 +8,10 @@ class Oystercard
 
   def top_up(amount)
     raise "Top up would take card balance over £#{Oystercard::LIMIT} limit" if @balance + amount > LIMIT
-    
     @balance += amount
+  end
+
+  def deduct(amount)
+    @balance -= amount
   end
 end
