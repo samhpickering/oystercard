@@ -1,6 +1,10 @@
 require 'oystercard'
 
 describe Oystercard do
+  before :each do
+    @station = double
+  end
+
   it 'starts with a balance of zero' do
     expect(subject.balance).to eq 0
   end
@@ -20,24 +24,30 @@ describe Oystercard do
 
   it 'allows you to start a journey' do
     subject.top_up(2)
-    subject.tap_in
+    subject.tap_in(@station)
     expect(subject).to be_in_journey
   end
 
   it 'allows you to end journey' do
     subject.top_up(2)
-    subject.tap_in
+    subject.tap_in(@station)
     subject.tap_out
     expect(subject).to_not be_in_journey
   end
 
   it 'raises an error if tapped in when balance is below minimum' do
-    expect { subject.tap_in }.to raise_error "Balance is below £#{Oystercard::MINIMUM} minimum"
+    expect { subject.tap_in(@station) }.to raise_error "Balance is below £#{Oystercard::MINIMUM} minimum"
   end
 
   it 'deducts from balance when we tap out' do
     subject.top_up(2)
-    subject.tap_in
+    subject.tap_in(@station)
     expect { subject.tap_out }.to change { subject.balance }.by(Oystercard::MINIMUM*-1)
+  end
+
+  it 'remembers the station it was last tapped in at' do
+    subject.top_up(2)
+    subject.tap_in(@station)
+    expect(subject.station).to eq(@station)
   end
 end
