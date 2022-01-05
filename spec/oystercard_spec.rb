@@ -14,10 +14,6 @@ describe Oystercard do
     expect { subject.top_up(Oystercard::LIMIT + 1) }.to raise_error error_msg
   end
 
-  it 'deducts the amount given' do
-    expect { subject.deduct(10) }.to change { subject.balance }.by(-10)
-  end
-
   it 'starts as not in use' do
     expect(subject).to_not be_in_journey
   end
@@ -37,5 +33,11 @@ describe Oystercard do
 
   it 'raises an error if tapped in when balance is below minimum' do
     expect { subject.tap_in }.to raise_error "Balance is below £#{Oystercard::MINIMUM} minimum"
+  end
+
+  it 'deducts from balance when we tap out' do
+    subject.top_up(2)
+    subject.tap_in
+    expect { subject.tap_out }.to change { subject.balance }.by(Oystercard::MINIMUM*-1)
   end
 end
