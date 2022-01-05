@@ -3,6 +3,7 @@ require 'oystercard'
 describe Oystercard do
   before :each do
     @station = double
+    @station_out = double
   end
 
   it 'starts with a balance of zero' do
@@ -31,7 +32,7 @@ describe Oystercard do
   it 'allows you to end journey' do
     subject.top_up(2)
     subject.tap_in(@station)
-    subject.tap_out
+    subject.tap_out(@station_out)
     expect(subject).to_not be_in_journey
   end
 
@@ -42,12 +43,27 @@ describe Oystercard do
   it 'deducts from balance when we tap out' do
     subject.top_up(2)
     subject.tap_in(@station)
-    expect { subject.tap_out }.to change { subject.balance }.by(Oystercard::MINIMUM*-1)
+    expect { subject.tap_out(@station_out) }.to change { subject.balance }.by(Oystercard::MINIMUM * -1)
   end
 
   it 'remembers the station it was last tapped in at' do
     subject.top_up(2)
     subject.tap_in(@station)
     expect(subject.station).to eq(@station)
+  end
+
+  it 'card has an empty list of journeys by default' do
+    expect(subject.history).to match_array([])
+  end
+
+  it 'adds a journey to the history when tapped in and out' do
+    subject.top_up(2)
+    subject.tap_in(@station)
+    subject.tap_out(@station_out)
+    expect(subject.history).to include({ tap_in: @station, tap_out: @station_out })
+  end
+
+  it 'raises an error when tapped out when not in a journey' do
+    expect { subject.tap_out(@station_out) }.to raise_error 'Card cannot be tapped out before it is tapped in'
   end
 end
