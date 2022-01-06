@@ -1,6 +1,7 @@
+require 'journey'
+
 class Oystercard
   LIMIT = 90
-  MINIMUM = 1
 
   attr_reader :balance, :history
 
@@ -16,24 +17,24 @@ class Oystercard
   end
 
   def in_journey?
-    history.last && history.last[:tap_out].nil?
+    history.last && !history.last.valid?
   end
 
   def station
-    history.last[:tap_in] if in_journey?
+    history.last.start_point if in_journey?
   end
 
   def tap_in (station)
-    fail "Balance is below £#{MINIMUM} minimum" if @balance < MINIMUM
+    fail "Balance is below £#{Journey::MINIMUM_FARE} minimum" if @balance < Journey::MINIMUM_FARE
 
-    @history.push({tap_in: station, tap_out: nil})
+    journey = Journey.new
+    journey.start_point = station
+    @history.push(journey)
   end
 
   def tap_out (station)
-    fail 'Card cannot be tapped out before it is tapped in' unless in_journey?
-
-    deduct(MINIMUM)
-    @history.last[:tap_out] = station
+    deduct(Journey::MINIMUM_FARE)
+    @history.last.end_point = station
   end
 
   private

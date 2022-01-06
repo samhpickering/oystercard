@@ -37,13 +37,13 @@ describe Oystercard do
   end
 
   it 'raises an error if tapped in when balance is below minimum' do
-    expect { subject.tap_in(@station) }.to raise_error "Balance is below £#{Oystercard::MINIMUM} minimum"
+    expect { subject.tap_in(@station) }.to raise_error RuntimeError
   end
 
   it 'deducts from balance when we tap out' do
     subject.top_up(2)
     subject.tap_in(@station)
-    expect { subject.tap_out(@station_out) }.to change { subject.balance }.by(Oystercard::MINIMUM * -1)
+    expect { subject.tap_out(@station_out) }.to change { subject.balance }.by_at_most(-1)
   end
 
   it 'remembers the station it was last tapped in at' do
@@ -56,14 +56,8 @@ describe Oystercard do
     expect(subject.history).to match_array([])
   end
 
-  it 'adds a journey to the history when tapped in and out' do
+  it 'adds a journey to the history when tapped in' do
     subject.top_up(2)
-    subject.tap_in(@station)
-    subject.tap_out(@station_out)
-    expect(subject.history).to include({ tap_in: @station, tap_out: @station_out })
-  end
-
-  it 'raises an error when tapped out when not in a journey' do
-    expect { subject.tap_out(@station_out) }.to raise_error 'Card cannot be tapped out before it is tapped in'
+    expect { subject.tap_in(@station) }.to change { subject.history.length }.by(1)
   end
 end
